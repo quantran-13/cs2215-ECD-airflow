@@ -44,6 +44,8 @@ def train_training_pipeline(
         "forecasting_horizon": forecasting_horizon,
     }
 
+    res = send_request(url, payload)
+
     task_id = res["task_id"]
     task_status = res["task_status"]
     res = check_task_status(task_id, task_status)

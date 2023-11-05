@@ -13,6 +13,9 @@ def check_task_status(task_id: str, task_status: str = "created") -> dict:
         res = get_task_status(task_id)
         task_status = res["task_status"]
 
+        if task_status in ["failed", "unknown"]:
+            raise Exception("Task failed")
+
         time.sleep(10)
 
     return res

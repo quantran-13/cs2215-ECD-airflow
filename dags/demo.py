@@ -3,24 +3,29 @@ import datetime as dt
 from airflow import DAG
 from airflow.models import Variable
 from airflow.operators.python import PythonOperator
-from thirdparty.clearml.batch_prediction_pipeline import batch_predict_batch_pipeline
+from thirdparty.clearml.batch_prediction_pipeline import (
+    batch_predict_batch_pipeline,
+)
 from thirdparty.clearml.feature_pipeline import (
     extract_feature_pipeline,
     load_feature_pipeline,
     transform_feature_pipeline,
     validate_feature_pipeline,
 )
-from thirdparty.clearml.training_pipeline import hpo_training_pipeline, train_training_pipeline
+from thirdparty.clearml.training_pipeline import (
+    hpo_training_pipeline,
+    train_training_pipeline,
+)
 
 default_args = {
     "depends_on_past": True,
     "retries": 1,
     "retry_delay": dt.timedelta(minutes=5),
-    "start_date": dt.datetime(2023, 1, 1),
+    "start_date": dt.datetime(year=2022, month=1, day=1),
     # 'queue': 'bash_queue',
     # 'pool': 'backfill',
     # 'priority_weight': 10,
-    "end_date": dt.datetime(2023, 2, 1),
+    "end_date": dt.datetime(year=2023, month=6, day=1),
     # 'wait_for_downstream': False,
     # 'sla': timedelta(hours=2),
     # 'execution_timeout': timedelta(seconds=300),
@@ -34,17 +39,17 @@ default_args = {
 }
 
 dag = DAG(
-    "feature_pipeline",
+    dag_id="feature_pipeline",
     default_args=default_args,
     description="Feature pipeline",
     schedule=dt.timedelta(days=7),
     catchup=True,
-    tags=["feature-pipeline"],
+    tags=["pipeline"],
 )
 
-days_delay = int(Variable.get("ml_pipeline_days_delay", default_var=15))
-days_export = int(Variable.get("ml_pipeline_days_export", default_var=30))
-feature_group_version = str(Variable.get("ml_pipeline_feature_group_version", default_var="1.0"))
+days_delay = int(Variable.get(key="ml_pipeline_days_delay", default_var=15))
+days_export = int(Variable.get(key="ml_pipeline_days_export", default_var=30))
+feature_group_version = str(Variable.get(key="ml_pipeline_feature_group_version", default_var="1.0"))
 
 t1 = PythonOperator(
     task_id="extract",
